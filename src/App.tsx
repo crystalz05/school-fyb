@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { PhotoUpload } from './components/PhotoUpload/PhotoUpload';
 import { Preview } from './components/Preview/Preview';
@@ -391,7 +391,7 @@ export default function App() {
           <Preview
             data={debouncedValues}
             isExpanded={true}
-            onToggle={() => {}}
+            onToggle={() => { }}
           />
         ) : (
           <Preview
