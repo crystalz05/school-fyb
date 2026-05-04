@@ -57,9 +57,10 @@ function FieldRow({
           textAlign: 'center',
           whiteSpace: 'pre-wrap',
           lineHeight: 1.2,
+          wordBreak: 'break-word',
         }}
       >
-        {label}
+        <span style={{ display: 'flex' }}>{label}</span>
       </div>
       <div
         style={{
@@ -74,7 +75,7 @@ function FieldRow({
           lineHeight: 1.3,
         }}
       >
-        {value || ''}
+        <span style={{ display: 'flex' }}>{value || ''}</span>
       </div>
     </div>
   );
@@ -95,9 +96,10 @@ function InfoRow({ label, value }: { label: string; value: string }) {
           alignSelf: 'flex-start',
           marginBottom: 4,
           letterSpacing: 1,
+          display: 'flex',
         }}
       >
-        {label}
+        <span style={{ display: 'flex' }}>{label}</span>
       </div>
       <div
         style={{
@@ -108,9 +110,10 @@ function InfoRow({ label, value }: { label: string; value: string }) {
           color: '#111',
           width: '100%',
           whiteSpace: 'pre-wrap',
+          display: 'flex',
         }}
       >
-        {value || ''}
+        <span style={{ display: 'flex' }}>{value || ''}</span>
       </div>
     </div>
   );
@@ -156,14 +159,15 @@ export function FlyerTemplate({ data }: Props) {
                 color: DARK_GREEN,
                 letterSpacing: 1,
                 fontFamily: 'Oswald',
+                display: 'flex',
               }}
             >
-              AUCHI POLYTECHNIC
+              <span style={{ display: 'flex' }}>AUCHI POLYTECHNIC</span>
             </div>
-            <div style={{ width: '100%', height: 2, backgroundColor: YELLOW, margin: '3px 0' }} />
-            <div style={{ fontSize: 13, color: '#333' }}>Auchi, Edo State</div>
-            <div style={{ fontSize: 12, color: '#555' }}>
-              Computer Science (Software &amp; Web Development)
+            <div style={{ width: '100%', height: 2, backgroundColor: YELLOW, margin: '3px 0', display: 'block' }} />
+            <div style={{ fontSize: 13, color: '#333', display: 'flex' }}><span style={{ display: 'flex' }}>Auchi, Edo State</span></div>
+            <div style={{ fontSize: 12, color: '#555', display: 'flex' }}>
+              <span style={{ display: 'flex' }}>Computer Science (Software &amp; Web Development)</span>
             </div>
           </div>
         </div>
@@ -185,9 +189,10 @@ export function FlyerTemplate({ data }: Props) {
               fontFamily: 'Oswald',
               lineHeight: 0.9,
               letterSpacing: -2,
+              display: 'flex',
             }}
           >
-            FYB
+            <span style={{ display: 'flex' }}>FYB</span>
           </div>
           <div
             style={{
@@ -197,9 +202,10 @@ export function FlyerTemplate({ data }: Props) {
               backgroundColor: YELLOW,
               padding: '2px 14px',
               letterSpacing: 2,
+              display: 'flex',
             }}
           >
-            OF THE
+            <span style={{ display: 'flex' }}>OF THE</span>
           </div>
           <div
             style={{
@@ -209,9 +215,10 @@ export function FlyerTemplate({ data }: Props) {
               fontFamily: 'Oswald',
               lineHeight: 0.9,
               letterSpacing: -2,
+              display: 'flex',
             }}
           >
-            WEEK
+            <span style={{ display: 'flex' }}>WEEK</span>
           </div>
         </div>
       </div>
@@ -252,12 +259,12 @@ export function FlyerTemplate({ data }: Props) {
                 justifyContent: 'center',
               }}
             >
-              <div style={{ color: YELLOW, fontSize: 18, opacity: 0.5 }}>Photo</div>
+              <div style={{ color: YELLOW, fontSize: 18, opacity: 0.5, display: 'flex' }}><span style={{ display: 'flex' }}>Photo</span></div>
             </div>
           )}
 
           {/* Divider */}
-          <div style={{ width: '100%', height: 2, backgroundColor: YELLOW, margin: '10px 0' }} />
+          <div style={{ width: '100%', height: 2, backgroundColor: YELLOW, margin: '10px 0', display: 'flex' }} />
 
           <InfoRow label="NAME" value={data.fullName || ''} />
           <InfoRow label="D.O.B" value={data.dateOfBirth || ''} />
@@ -265,11 +272,11 @@ export function FlyerTemplate({ data }: Props) {
           <InfoRow label="FAVOURITE QUOTE" value={data.favouriteQuote ? `"${data.favouriteQuote.replace(/^["']|["']$/g, '')}"` : ''} />
 
           {/* Social handle */}
-          <div style={{ marginTop: 6, color: WHITE, fontSize: 14, letterSpacing: 1 }}>
-            SOCIAL MEDIA HANDLE
+          <div style={{ marginTop: 6, color: WHITE, fontSize: 14, letterSpacing: 1, display: 'flex' }}>
+            <span style={{ display: 'flex' }}>SOCIAL MEDIA HANDLE</span>
           </div>
-          <div style={{ color: WHITE, fontSize: 15, fontWeight: 600 }}>
-            @{handle || '_______________'}
+          <div style={{ color: WHITE, fontSize: 15, fontWeight: 600, display: 'flex' }}>
+            <span style={{ display: 'flex' }}>@{handle || '_______________'}</span>
           </div>
           {/* Footer */}
           <div
@@ -280,9 +287,10 @@ export function FlyerTemplate({ data }: Props) {
               fontSize: 15,
               fontWeight: 700,
               letterSpacing: 2,
+              display: 'flex',
             }}
           >
-            #FYB PROFILE
+            <span style={{ display: 'flex' }}>#FYB PROFILE</span>
           </div>
         </div>
 

@@ -14,10 +14,10 @@ async function loadFonts() {
 
   const [interRes, oswaldRes] = await Promise.all([
     fetch(
-      'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2'
+      'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.19/files/inter-latin-400-normal.woff'
     ),
     fetch(
-      'https://fonts.gstatic.com/s/oswald/v49/TK3_WkUHHAIjg75cFRf3bXL8LICs13NvgUFoZAaRliE.woff2'
+      'https://cdn.jsdelivr.net/npm/@fontsource/oswald@5.2.8/files/oswald-latin-700-normal.woff'
     ),
   ]);
 
@@ -38,7 +38,7 @@ export async function generateSvg(data: Partial<FlyerData>): Promise<string> {
     height: H,
     fonts: [
       { name: 'Inter', data: fonts.inter, weight: 400, style: 'normal' },
-      { name: 'Oswald', data: fonts.oswald, weight: 900, style: 'normal' },
+      { name: 'Oswald', data: fonts.oswald, weight: 700, style: 'normal' },
     ],
   });
 
