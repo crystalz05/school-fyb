@@ -13,11 +13,11 @@ const MAX_CHARS: Record<string, number> = {
   stateOfOrigin: 20,
   favouriteQuote: 120,
   socialHandle: 20,
-  hobbies: 20,
-  bestCourse: 20,
-  bestLecturer: 20,
-  favouriteCourseMate: 20,
-  ifNotSoftware: 20,
+  hobbies: 30,
+  bestCourse: 30,
+  bestLecturer: 30,
+  favouriteCourseMate: 30,
+  ifNotSoftware: 30,
   bestExperienceInAuchi: 100,
   worstExperienceInAuchi: 100,
 };
@@ -312,11 +312,11 @@ export default function App() {
               <h2 className="form-section__title">🎓 Academic Details</h2>
 
               {[
-                { id: 'hobbies', label: 'Hobbies', max: 20, placeholder: 'e.g. Coding, Music' },
-                { id: 'bestCourse', label: 'Best Course', max: 20, placeholder: 'e.g. Data Structures' },
-                { id: 'bestLecturer', label: 'Best Lecturer', max: 20, placeholder: 'e.g. Mr. Adekunle' },
-                { id: 'favouriteCourseMate', label: 'Favourite Course Mate', max: 20, placeholder: 'e.g. Chioma Obi' },
-                { id: 'ifNotSoftware', label: 'If Not Software, What?', max: 20, placeholder: 'e.g. Architect' },
+                { id: 'hobbies', label: 'Hobbies', max: 30, placeholder: 'e.g. Coding, Music' },
+                { id: 'bestCourse', label: 'Best Course', max: 30, placeholder: 'e.g. Data Structures' },
+                { id: 'bestLecturer', label: 'Best Lecturer', max: 30, placeholder: 'e.g. Mr. Adekunle' },
+                { id: 'favouriteCourseMate', label: 'Favourite Course Mate', max: 30, placeholder: 'e.g. Chioma Obi' },
+                { id: 'ifNotSoftware', label: 'If Not Software, What?', max: 30, placeholder: 'e.g. Architect' },
               ].map(({ id, label, max, placeholder }) => (
                 <div className="field" id={`field-${id}`} key={id}>
                   <label className="field__label" htmlFor={id}>
@@ -475,9 +475,30 @@ export default function App() {
         <FlyerTemplate data={debouncedValues} ref={captureRef} />
       </div>
 
-      {/* ── FLOATING SAVE BUTTON ── */}
-      <SaveButton watchedValues={watchedValues} photo={photo} />
+      {/* ── FLOATING BUTTONS ── */}
+      <div className="floating-actions">
+        <ResetButton onReset={handleReset} />
+        <SaveButton watchedValues={watchedValues} photo={photo} />
+      </div>
     </div>
+  );
+}
+
+function ResetButton({ onReset }: { onReset: () => void }) {
+  const handleClear = () => {
+    if (window.confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+      onReset();
+    }
+  };
+
+  return (
+    <button 
+      type="button" 
+      className="floating-reset"
+      onClick={handleClear}
+    >
+      <>🗑️ Clear Data</>
+    </button>
   );
 }
 

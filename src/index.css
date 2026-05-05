@@ -555,28 +555,45 @@ body {
   transition: all var(--transition);
 }
 
-.floating-save:hover {
-  background-color: var(--primary-dark);
+.floating-reset {
+  position: fixed;
+  bottom: 24px;
+  right: 170px; /* Positioned to the left of the save button */
+  z-index: 998;
+  box-shadow: var(--shadow-float);
+  padding: 12px 24px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideUp 0.3s ease-out;
+  background-color: #ef4444; /* Danger red */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all var(--transition);
+}
+
+.floating-reset:hover {
+  background-color: #dc2626;
   transform: translateY(-2px);
 }
 
-.floating-save:active {
+.floating-reset:active {
   transform: scale(0.95);
-}
-
-.floating-save--success {
-  background-color: var(--success);
-}
-
-@keyframes slideUp {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
 }
 
 @media (max-width: 899px) {
   .floating-save {
-    bottom: 80px; /* Above the mobile nav if there was one, or just higher */
+    bottom: 80px;
     right: 16px;
+    padding: 10px 16px;
+  }
+  .floating-reset {
+    bottom: 80px;
+    right: 130px; /* Adjusted for mobile */
     padding: 10px 16px;
   }
 }
