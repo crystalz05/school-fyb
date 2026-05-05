@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { PhotoUpload } from './components/PhotoUpload/PhotoUpload';
 import { Preview } from './components/Preview/Preview';
-import { useWasm } from './hooks/useWasm';
 import { useDebounce } from './hooks/useDebounce';
 import { generateAndDownload } from './lib/generateFlyer';
+import { FlyerTemplate } from './components/FlyerTemplate/FlyerTemplate';
 import { LEVEL_OPTIONS, NIGERIA_STATES, type FlyerData } from './types/FlyerData';
 
 const MAX_CHARS: Record<string, number> = {
@@ -29,13 +29,12 @@ function FieldError({ message }: { message?: string }) {
 }
 
 export default function App() {
-  const { isReady, isLoading, status } = useWasm();
   const [photo, setPhoto] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [downloadDone, setDownloadDone] = useState(false);
   const [previewExpanded, setPreviewExpanded] = useState(window.innerWidth >= 900);
-
-
+  
+  const captureRef = useRef<HTMLDivElement>(null);
   const {
     register, handleSubmit, watch, reset, control,
     formState: { errors },
@@ -60,11 +59,10 @@ export default function App() {
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-      if (!isReady) return;
 
       setIsGenerating(true);
       try {
-        await generateAndDownload({ ...data, photo });
+        await generateAndDownload({ ...data, photo }, captureRef);
         setDownloadDone(true);
       } catch (err) {
         console.error(err);
@@ -73,7 +71,7 @@ export default function App() {
         setIsGenerating(false);
       }
     },
-    [photo, isReady]
+    [photo]
   );
 
   const handleReset = useCallback(() => {
@@ -103,16 +101,6 @@ export default function App() {
             <p className="app-header__sub">Auchi Polytechnic · CS Dept.</p>
           </div>
         </div>
-        {isLoading && (
-          <div className="wasm-banner" role="status">
-            <span className="spinner spinner--sm" /> Preparing generator…
-          </div>
-        )}
-        {status === 'error' && (
-          <div className="wasm-banner wasm-banner--error" role="alert">
-            ⚠ Generator failed to load. Refresh the page.
-          </div>
-        )}
       </header>
 
       {/* ── LAYOUT ─────────────────────────────── */}
@@ -354,7 +342,7 @@ export default function App() {
                   <div className="success-banner">
                     🎉 Your flyer was downloaded successfully!
                   </div>
-                  <button type="submit" className="btn btn--primary btn--lg" disabled={!isReady || isGenerating}>
+                  <button type="submit" className="btn btn--primary btn--lg" disabled={isGenerating}>
                     {isGenerating ? <><span className="spinner" /> Generating…</> : '⬇ Download Again'}
                   </button>
                 </>
@@ -363,8 +351,8 @@ export default function App() {
                   type="submit"
                   id="generate-btn"
                   className="btn btn--primary btn--lg"
-                  disabled={!isReady || isGenerating || !photo}
-                  title={!isReady ? 'Generator is loading…' : !photo ? 'Please upload a photo first' : ''}
+                  disabled={isGenerating || !photo}
+                  title={!photo ? 'Please upload a photo first' : ''}
                 >
                   {isGenerating ? (
                     <><span className="spinner" /> Generating your flyer…</>
@@ -400,6 +388,11 @@ export default function App() {
             onToggle={() => setPreviewExpanded((p) => !p)}
           />
         )}
+      </div>
+
+      {/* ── CAPTURE TARGET (Hidden DOM Node) ── */}
+      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+        <FlyerTemplate data={debouncedValues} ref={captureRef} />
       </div>
     </div>
   );

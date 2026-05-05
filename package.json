@@ -10,12 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@resvg/resvg-wasm": "^2.6.2",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/oswald": "^5.2.8",
+    "html-to-image": "^1.11.13",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-hook-form": "^7.75.0",
-    "react-image-crop": "^11.0.10",
-    "satori": "^0.26.0"
+    "react-image-crop": "^11.0.10"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

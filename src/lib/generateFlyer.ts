@@ -1,90 +1,83 @@
-import satori from 'satori';
+import { toJpeg } from 'html-to-image';
 import type { FlyerData } from '../types/FlyerData';
-import { FlyerTemplate } from './satoriTemplate';
-import React from 'react';
 
-const W = 1080;
-const H = 1350;
-
-// Cache loaded font buffers so we only fetch once per session
-let fontCache: { inter: ArrayBuffer; oswald: ArrayBuffer } | null = null;
-
-async function loadFonts() {
-  if (fontCache) return fontCache;
-
-  const [interRes, oswaldRes] = await Promise.all([
-    fetch(
-      'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.19/files/inter-latin-400-normal.woff'
-    ),
-    fetch(
-      'https://cdn.jsdelivr.net/npm/@fontsource/oswald@5.2.8/files/oswald-latin-700-normal.woff'
-    ),
-  ]);
-
-  fontCache = {
-    inter: await interRes.arrayBuffer(),
-    oswald: await oswaldRes.arrayBuffer(),
-  };
-
-  return fontCache;
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
 }
 
-/** Generate SVG string from current form data (fast — used for live preview) */
-export async function generateSvg(data: Partial<FlyerData>): Promise<string> {
-  const fonts = await loadFonts();
+// Cache the css string so we only build it once
+let cachedFontCSS = '';
 
-  const svg = await satori(React.createElement(FlyerTemplate, { data }), {
-    width: W,
-    height: H,
-    fonts: [
-      { name: 'Inter', data: fonts.inter, weight: 400, style: 'normal' },
-      { name: 'Oswald', data: fonts.oswald, weight: 700, style: 'normal' },
-    ],
-  });
+async function getFontEmbedCSS(): Promise<string> {
+  if (cachedFontCSS) return cachedFontCSS;
 
-  return svg;
+  const fonts = [
+    { family: 'Inter', url: '/fonts/inter-400.woff', weight: 400 },
+    { family: 'Inter', url: '/fonts/inter-700.woff', weight: 700 },
+    { family: 'Oswald', url: '/fonts/oswald-700.woff', weight: 700 },
+  ];
+
+  const cssParts = await Promise.all(
+    fonts.map(async (font) => {
+      const res = await fetch(font.url);
+      const buffer = await res.arrayBuffer();
+      const base64 = arrayBufferToBase64(buffer);
+      return `@font-face {
+        font-family: '${font.family}';
+        src: url(data:font/woff;base64,${base64}) format('woff');
+        font-weight: ${font.weight};
+        font-style: normal;
+      }`;
+    })
+  );
+
+  cachedFontCSS = cssParts.join('\n');
+  return cachedFontCSS;
 }
 
-/** Full pipeline: SVG → PNG (resvg-wasm) → JPEG → download */
-export async function generateAndDownload(data: FlyerData): Promise<void> {
-  const { Resvg } = await import('@resvg/resvg-wasm');
+export async function generateAndDownload(
+  data: FlyerData,
+  elementRef: React.RefObject<HTMLDivElement | null>
+): Promise<void> {
+  const element = elementRef.current;
+  if (!element) {
+    throw new Error('Flyer element not found');
+  }
 
-  const svg = await generateSvg(data);
+  // 1. Wait for fonts and fetch manual embed CSS
+  await document.fonts.ready;
+  const fontEmbedCSS = await getFontEmbedCSS();
 
-  // Rasterise SVG → PNG
-  const resvg = new Resvg(svg, {
-    fitTo: { mode: 'width', value: W },
+  // 2. Wait for images
+  const images = Array.from(element.querySelectorAll('img'));
+  await Promise.all(
+    images.map((img) => {
+      if (img.complete) return Promise.resolve();
+      return new Promise((resolve) => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+    })
+  );
+
+  // 3. Capture
+  const dataUrl = await toJpeg(element, {
+    pixelRatio: 2,
+    quality: 0.95,
+    fontEmbedCSS, // Bypass html-to-image buggy CSS parser!
   });
-  const pngData = resvg.render();
-  const pngBuffer = pngData.asPng();
 
-  // PNG → Canvas → JPEG
-  const blob = new Blob([pngBuffer as unknown as BlobPart], { type: 'image/png' });
-  const url = URL.createObjectURL(blob);
-
-  const img = new Image();
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
-    img.onerror = reject;
-    img.src = url;
-  });
-
-  const canvas = document.createElement('canvas');
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d')!;
-  ctx.drawImage(img, 0, 0);
-  URL.revokeObjectURL(url);
-
-  const jpegBase64 = canvas.toDataURL('image/jpeg', 0.92);
-
-  // Trigger download
-  const firstName = data.fullName.split(' ')[0].toLowerCase();
-  const year = new Date().getFullYear();
-  const filename = `fyb-${firstName}-${year}.jpg`;
-
-  const a = document.createElement('a');
-  a.href = jpegBase64;
-  a.download = filename;
-  a.click();
+  // 4. Download
+  const link = document.createElement('a');
+  link.download = `FYB_${data.fullName.replace(/\s+/g, '_')}.jpg`;
+  link.href = dataUrl;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
