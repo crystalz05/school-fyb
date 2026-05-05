@@ -21,6 +21,9 @@ async function getFontEmbedCSS(): Promise<string> {
     { family: 'Inter', url: '/fonts/inter-400.woff', weight: 400 },
     { family: 'Inter', url: '/fonts/inter-700.woff', weight: 700 },
     { family: 'Oswald', url: '/fonts/oswald-700.woff', weight: 700 },
+    { family: 'Raleway', url: '/fonts/raleway-400.woff', weight: 400 },
+    { family: 'Raleway', url: '/fonts/raleway-700.woff', weight: 700 },
+    { family: 'Raleway', url: '/fonts/raleway-900.woff', weight: 900 },
   ];
 
   const cssParts = await Promise.all(
@@ -75,7 +78,8 @@ export async function generateAndDownload(
 
   // 4. Download
   const link = document.createElement('a');
-  link.download = `FYB_${data.fullName.replace(/\s+/g, '_')}.jpg`;
+  const safeName = `${data.firstName || ''}_${data.surname || ''}`.replace(/\s+/g, '_');
+  link.download = `FYB_${safeName}.jpg`;
   link.href = dataUrl;
   document.body.appendChild(link);
   link.click();

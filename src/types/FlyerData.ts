@@ -1,5 +1,6 @@
 export interface FlyerData {
-  fullName: string;
+  firstName: string;
+  surname: string;
   dateOfBirth: string;
   stateOfOrigin: string;
   favouriteQuote: string;

@@ -1,34 +1,45 @@
 import { forwardRef } from 'react';
 import type { FlyerData } from '../../types/FlyerData';
 
-interface ExtendedFlyerData extends Partial<FlyerData> {
-  favouriteCourseMate?: string;
-  ifNotSoftware?: string;
-  bestExperienceInAuchi?: string;
-  worstExperienceInAuchi?: string;
-}
-
 interface Props {
-  data: ExtendedFlyerData;
+  data: Partial<FlyerData>;
 }
 
 const YELLOW = '#f5c500';
 const WHITE = '#ffffff';
 
-/** A single right-column value rendered below its (pre-baked) label */
-function RightValue({ top, value }: { top: number; value?: string }) {
+/** Helper to Title Case strings (e.g. "michael ehigie" -> "Michael Ehigie") */
+function toTitleCase(str: string = '') {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+/** A single right-column value rendered with Raleway font */
+function RalewayValue({ top, left = '620px', value, fontSize = '28px', color = WHITE, fontWeight = 600, width = '510px' }: {
+  top: number;
+  left?: string;
+  value?: string;
+  fontSize?: string;
+  color?: string;
+  fontWeight?: number;
+  width?: string;
+}) {
   return (
     <div
       style={{
         position: 'absolute',
         top: `${top}px`,
-        left: '620px',
-        width: '510px',
-        color: WHITE,
-        fontFamily: '"Inter", "Helvetica Neue", sans-serif',
-        fontSize: '22px',
-        fontWeight: 400,
-        lineHeight: 1.3,
+        left,
+        width,
+        color,
+        fontFamily: '"Raleway", sans-serif',
+        fontSize,
+        fontWeight,
+        lineHeight: 1.2,
         wordBreak: 'break-word',
       }}
     >
@@ -39,7 +50,8 @@ function RightValue({ top, value }: { top: number; value?: string }) {
 
 export const FlyerTemplate = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const {
-    fullName,
+    firstName,
+    surname,
     dateOfBirth,
     favouriteQuote,
     socialHandle,
@@ -55,32 +67,31 @@ export const FlyerTemplate = forwardRef<HTMLDivElement, Props>(({ data }, ref) =
     worstExperienceInAuchi,
   } = data;
 
+
   return (
     <div
       ref={ref}
       style={{
         width: '1080px',
-        height: '1350px',
+        height: '1400px',
         backgroundImage: 'url("/images/background.jpeg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        fontFamily: '"Inter", "Helvetica Neue", sans-serif',
         position: 'relative',
         overflow: 'hidden',
         boxSizing: 'border-box',
       }}
     >
-
-      {/* ── PHOTO ── sits inside the tilted frame baked into the background */}
+      {/* ── PHOTO ── */}
       {photo && (
         <div
           style={{
             position: 'absolute',
-            top: '352px',
+            top: '377px',
             left: '154px',
             width: '328px',
-            // height: '434px',
+            height: '434px',
             overflow: 'hidden',
             transform: 'rotate(5.5deg)',
             transformOrigin: 'center center',
@@ -95,69 +106,81 @@ export const FlyerTemplate = forwardRef<HTMLDivElement, Props>(({ data }, ref) =
         </div>
       )}
 
-      {/* ── FULL NAME ── large yellow text below the photo */}
+      {/* ── SURNAME ── */}
       <div
         style={{
           position: 'absolute',
-          top: '718px',
-          left: '55px',
+          top: '953px',
+          left: '115px',
           width: '450px',
           color: YELLOW,
-          fontFamily: '"Oswald", "Arial Black", sans-serif',
+          fontFamily: '"Raleway", sans-serif',
+          fontWeight: 900,
+          fontSize: '66px',
+          transform: 'rotate(-5deg)',
+          lineHeight: 1.0,
+          letterSpacing: '-1px',
+        }}
+      >
+        {toTitleCase(surname)}
+      </div>
+
+      {/* ── FIRSTNAME ── */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '1025px',
+          left: '125px',
+          width: '450px',
+          color: YELLOW,
+          fontFamily: '"Raleway", sans-serif',
           fontWeight: 700,
           fontSize: '56px',
           lineHeight: 1.0,
           letterSpacing: '-1px',
         }}
       >
-        {fullName}
+        {toTitleCase(firstName)}
       </div>
 
       {/* ── BIRTHDAY ── */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '870px',
-          left: '55px',
-          width: '450px',
-          color: WHITE,
-          fontFamily: '"Inter", "Helvetica Neue", sans-serif',
-          fontSize: '24px',
-          fontWeight: 600,
-        }}
-      >
-        {dateOfBirth ? `Birthday: ${dateOfBirth}` : ''}
-      </div>
+      <RalewayValue
+        top={1095}
+        left="125px"
+        width="450px"
+        fontSize="34px"
+        fontWeight={400}
+        value={dateOfBirth ? `Birthday: ${dateOfBirth.replace('-', ' ')}` : ''}
+      />
 
-      {/* ── FAVOURITE QUOTE ── overlaid on the white quote box in the bg */}
+      {/* ── FAVOURITE QUOTE ── */}
       <div
         style={{
           position: 'absolute',
-          top: '985px',
-          left: '72px',
+          top: '1155px',
+          left: '114px',
           width: '360px',
           height: '108px',
-          color: '#555',
-          fontFamily: '"Inter", "Helvetica Neue", sans-serif',
-          fontSize: '15px',
+          color: 'black',
+          fontWeight: 600,
+          fontFamily: '"Raleway", sans-serif',
+          fontSize: '20px',
           fontStyle: 'italic',
-          lineHeight: 1.45,
+          lineHeight: 1.2,
           overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'center',
         }}
       >
         {favouriteQuote || ''}
       </div>
 
-      {/* ── SOCIAL HANDLE ── @ symbol is already on the bg */}
+      {/* ── SOCIAL HANDLE ── */}
       <div
         style={{
           position: 'absolute',
-          top: '1152px',
-          left: '96px',
+          top: '1265px',
+          left: '156px',
           color: WHITE,
-          fontFamily: '"Inter", "Helvetica Neue", sans-serif',
+          fontFamily: '"Raleway", sans-serif',
           fontSize: '18px',
           fontWeight: 600,
           letterSpacing: '0.5px',
@@ -165,24 +188,69 @@ export const FlyerTemplate = forwardRef<HTMLDivElement, Props>(({ data }, ref) =
       >
         {socialHandle || ''}
       </div>
+      <div
+        style={{
+          position: 'absolute',
+          top: '1294px',
+          left: '126px',
+          color: WHITE,
+          fontFamily: '"Raleway", sans-serif',
+          fontSize: '14px',
+          fontWeight: 400,
+          letterSpacing: '0.5px',
+        }}
+      >
+        Social media handle
+      </div>
 
-      {/* ══════════════════════════════════════════════
-          RIGHT COLUMN VALUES
-          Each sits directly below its yellow label
-          already printed on the background image.
-          Tweak the `top` values by ±5–10px if your
-          background image renders at a slightly
-          different crop / scale.
-      ══════════════════════════════════════════════ */}
-      <RightValue top={420}  value={hobbies} />
-      <RightValue top={468}  value={bestCourse} />
-      <RightValue top={546}  value={bestLecturer} />
-      <RightValue top={624}  value={bestLevel} />
-      <RightValue top={700}  value={worstLevel} />
-      <RightValue top={778}  value={favouriteCourseMate} />
-      <RightValue top={856}  value={ifNotSoftware} />
-      <RightValue top={934}  value={bestExperienceInAuchi} />
-      <RightValue top={1012} value={worstExperienceInAuchi} />
+      {/* ── RIGHT COLUMN VALUES ── */}
+      <RalewayValue top={445}  value={toTitleCase(hobbies)} />
+      <RalewayValue top={535}  value={toTitleCase(bestCourse)} />
+      <RalewayValue top={625}  value={toTitleCase(bestLecturer)} />
+      <RalewayValue top={725}  value={toTitleCase(bestLevel)} />
+      <RalewayValue top={815}  value={toTitleCase(worstLevel)} />
+      <RalewayValue top={915}  value={toTitleCase(favouriteCourseMate)} />
+      <RalewayValue top={1005} value={toTitleCase(ifNotSoftware)} />
+
+      {/* ── BEST EXPERIENCE ── */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '1105px',
+          left: '620px',
+          width: '400px',
+          height: '108px',
+          color: 'white',
+          fontWeight: 600,
+          fontFamily: '"Raleway", sans-serif',
+          fontSize: '20px',
+          fontStyle: 'italic',
+          lineHeight: 1.2,
+          overflow: 'hidden',
+        }}
+      >
+        {bestExperienceInAuchi || ''}
+      </div>
+
+      {/* ── WORST EXPERIENCE ── */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '1220px',
+          left: '620px',
+          width: '400px',
+          height: '108px',
+          color: 'white',
+          fontWeight: 600,
+          fontFamily: '"Raleway", sans-serif',
+          fontSize: '20px',
+          fontStyle: 'italic',
+          lineHeight: 1.2,
+          overflow: 'hidden',
+        }}
+      >
+        {worstExperienceInAuchi || ''}
+      </div>
 
     </div>
   );

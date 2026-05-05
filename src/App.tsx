@@ -8,14 +8,23 @@ import { FlyerTemplate } from './components/FlyerTemplate/FlyerTemplate';
 import { LEVEL_OPTIONS, NIGERIA_STATES, type FlyerData } from './types/FlyerData';
 
 const MAX_CHARS: Record<string, number> = {
-  fullName: 40, stateOfOrigin: 50, favouriteQuote: 120, socialHandle: 40,
-  hobbies: 80, bestCourse: 50, bestLecturer: 50, favouriteCourseMate: 50,
-  ifNotSoftware: 80, bestExperienceInAuchi: 100, worstExperienceInAuchi: 100,
+  firstName: 20,
+  surname: 20,
+  stateOfOrigin: 20,
+  favouriteQuote: 120,
+  socialHandle: 20,
+  hobbies: 20,
+  bestCourse: 20,
+  bestLecturer: 20,
+  favouriteCourseMate: 20,
+  ifNotSoftware: 20,
+  bestExperienceInAuchi: 100,
+  worstExperienceInAuchi: 100,
 };
 
 function CharCounter({ value, max }: { value: string; max: number }) {
   const len = value?.length ?? 0;
-  const near = len >= max - 10;
+  const near = len >= max - 5;
   return (
     <span className={`char-counter${near ? ' char-counter--warn' : ''}`}>
       {len}/{max}
@@ -80,14 +89,6 @@ export default function App() {
     setDownloadDone(false);
   }, [reset]);
 
-  // Strip @ from social handle on change
-  const socialHandleProps = register('socialHandle', {
-    maxLength: { value: 40, message: 'Max 40 characters' },
-    onChange: (e) => {
-      e.target.value = e.target.value.replace(/^@+/, '');
-    },
-  });
-
   const isDesktop = window.innerWidth >= 900;
 
   return (
@@ -122,38 +123,84 @@ export default function App() {
             <section className="form-section">
               <h2 className="form-section__title">👤 Personal Info</h2>
 
-              <div className="field" id="field-fullName">
-                <label className="field__label" htmlFor="fullName">
-                  Full Name <span className="field__required">*</span>
-                </label>
-                <div className="field__input-row">
-                  <input
-                    id="fullName"
-                    className={`input${errors.fullName ? ' input--error' : ''}`}
-                    placeholder="e.g. Michael Ehigie"
-                    {...register('fullName', {
-                      required: 'Full name is required',
-                      maxLength: { value: 40, message: 'Max 40 characters' },
-                    })}
-                  />
-                  <CharCounter value={watchedValues.fullName} max={MAX_CHARS.fullName} />
+              <div className="field-row">
+                <div className="field" id="field-firstName">
+                  <label className="field__label" htmlFor="firstName">
+                    First Name <span className="field__required">*</span>
+                  </label>
+                  <div className="field__input-row">
+                    <input
+                      id="firstName"
+                      className={`input${errors.firstName ? ' input--error' : ''}`}
+                      placeholder="Michael"
+                      {...register('firstName', {
+                        required: 'Required',
+                        maxLength: { value: 20, message: 'Max 20' },
+                      })}
+                    />
+                    <CharCounter value={watchedValues.firstName} max={MAX_CHARS.firstName} />
+                  </div>
+                  <FieldError message={errors.firstName?.message} />
                 </div>
-                <FieldError message={errors.fullName?.message} />
+
+                <div className="field" id="field-surname">
+                  <label className="field__label" htmlFor="surname">
+                    Surname <span className="field__required">*</span>
+                  </label>
+                  <div className="field__input-row">
+                    <input
+                      id="surname"
+                      className={`input${errors.surname ? ' input--error' : ''}`}
+                      placeholder="Ehigie"
+                      {...register('surname', {
+                        required: 'Required',
+                        maxLength: { value: 20, message: 'Max 20' },
+                      })}
+                    />
+                    <CharCounter value={watchedValues.surname} max={MAX_CHARS.surname} />
+                  </div>
+                  <FieldError message={errors.surname?.message} />
+                </div>
               </div>
 
               <div className="field" id="field-dateOfBirth">
-                <label className="field__label" htmlFor="dateOfBirth">
-                  Date of Birth <span className="field__required">*</span>
+                <label className="field__label">
+                  Birthday <span className="field__required">*</span>
                 </label>
-                <input
-                  id="dateOfBirth"
-                  type="date"
-                  className={`input${errors.dateOfBirth ? ' input--error' : ''}`}
-                  {...register('dateOfBirth', {
-                    required: 'Date of birth is required',
-                    validate: (v) => new Date(v) < new Date() || 'Must be a past date',
-                  })}
-                />
+                <div className="field-row">
+                  <Controller
+                    name="dateOfBirth"
+                    control={control}
+                    rules={{ required: 'Required' }}
+                    render={({ field }) => {
+                      const [month, day] = (field.value || '').split('-');
+                      return (
+                        <div className="field__input-row" style={{ gap: '0.5rem' }}>
+                          <select
+                            className="input select"
+                            value={month || ''}
+                            onChange={(e) => field.onChange(`${e.target.value}-${day || ''}`)}
+                          >
+                            <option value="">Month</option>
+                            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(m => (
+                              <option key={m} value={m}>{m}</option>
+                            ))}
+                          </select>
+                          <select
+                            className="input select"
+                            value={day || ''}
+                            onChange={(e) => field.onChange(`${month || ''}-${e.target.value}`)}
+                          >
+                            <option value="">Day</option>
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                              <option key={d} value={d.toString().padStart(2, '0')}>{d}</option>
+                            ))}
+                          </select>
+                        </div>
+                      );
+                    }}
+                  />
+                </div>
                 <FieldError message={errors.dateOfBirth?.message} />
               </div>
 
@@ -192,13 +239,10 @@ export default function App() {
                     id="favouriteQuote"
                     rows={3}
                     className={`input textarea${errors.favouriteQuote ? ' input--error' : ''}`}
-                    placeholder="Your favourite quote (no need to add quotes)"
+                    placeholder="Your favourite quote..."
                     {...register('favouriteQuote', {
                       required: 'Favourite quote is required',
-                      maxLength: { value: 120, message: 'Max 120 characters' },
-                      onChange: (e) => {
-                        e.target.value = e.target.value.replace(/^["']+|["']+$/g, '');
-                      },
+                      maxLength: { value: 120, message: 'Max 120' },
                     })}
                   />
                   <CharCounter value={watchedValues.favouriteQuote} max={MAX_CHARS.favouriteQuote} />
@@ -208,8 +252,7 @@ export default function App() {
 
               <div className="field" id="field-socialHandle">
                 <label className="field__label" htmlFor="socialHandle">
-                  Social Media Handle
-                  <span className="field__optional"> (optional)</span>
+                  Social Media Handle <span className="field__required">*</span>
                 </label>
                 <div className="field__input-row">
                   <div className="input-prefix-wrap">
@@ -217,8 +260,14 @@ export default function App() {
                     <input
                       id="socialHandle"
                       className={`input input--prefixed${errors.socialHandle ? ' input--error' : ''}`}
-                      placeholder="yourhandle"
-                      {...socialHandleProps}
+                      placeholder="username"
+                      {...register('socialHandle', {
+                        required: 'Required',
+                        maxLength: { value: 20, message: 'Max 20' },
+                        onChange: (e) => {
+                          e.target.value = e.target.value.replace(/^@+/, '');
+                        },
+                      })}
                     />
                   </div>
                   <CharCounter value={watchedValues.socialHandle} max={MAX_CHARS.socialHandle} />
@@ -232,11 +281,11 @@ export default function App() {
               <h2 className="form-section__title">🎓 Academic Details</h2>
 
               {[
-                { id: 'hobbies', label: 'Hobbies', max: 80, placeholder: 'e.g. Coding, Music, Gaming' },
-                { id: 'bestCourse', label: 'Best Course', max: 50, placeholder: 'e.g. Data Structures' },
-                { id: 'bestLecturer', label: 'Best Lecturer', max: 50, placeholder: 'e.g. Mr. Adekunle' },
-                { id: 'favouriteCourseMate', label: 'Favourite Course Mate', max: 50, placeholder: 'e.g. Chioma Obi' },
-                { id: 'ifNotSoftware', label: 'If Not Software, What?', max: 80, placeholder: 'e.g. Architect, Chef...' },
+                { id: 'hobbies', label: 'Hobbies', max: 20, placeholder: 'e.g. Coding, Music' },
+                { id: 'bestCourse', label: 'Best Course', max: 20, placeholder: 'e.g. Data Structures' },
+                { id: 'bestLecturer', label: 'Best Lecturer', max: 20, placeholder: 'e.g. Mr. Adekunle' },
+                { id: 'favouriteCourseMate', label: 'Favourite Course Mate', max: 20, placeholder: 'e.g. Chioma Obi' },
+                { id: 'ifNotSoftware', label: 'If Not Software, What?', max: 20, placeholder: 'e.g. Architect' },
               ].map(({ id, label, max, placeholder }) => (
                 <div className="field" id={`field-${id}`} key={id}>
                   <label className="field__label" htmlFor={id}>
@@ -249,7 +298,7 @@ export default function App() {
                       placeholder={placeholder}
                       {...register(id as keyof FlyerData, {
                         required: `${label} is required`,
-                        maxLength: { value: max, message: `Max ${max} characters` },
+                        maxLength: { value: max, message: `Max ${max}` },
                       })}
                     />
                     <CharCounter value={watchedValues[id as keyof FlyerData] as string} max={max} />
@@ -325,7 +374,7 @@ export default function App() {
                       placeholder={`Describe your ${label.toLowerCase()}…`}
                       {...register(id as keyof FlyerData, {
                         required: `${label} is required`,
-                        maxLength: { value: max, message: `Max ${max} characters` },
+                        maxLength: { value: max, message: `Max ${max}` },
                       })}
                     />
                     <CharCounter value={watchedValues[id as keyof FlyerData] as string} max={max} />
