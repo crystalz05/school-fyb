@@ -82,7 +82,7 @@ export const FlyerTemplate = forwardRef<HTMLDivElement, Props>(({ data }, ref) =
         overflow: 'hidden',
         boxSizing: 'border-box',
       }}
-    >
+    > 
       {/* ── PHOTO ── */}
       {photo && (
         <div

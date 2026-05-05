@@ -532,3 +532,52 @@ body {
 /* ── react-image-crop override ───────────────────── */
 .ReactCrop__crop-selection { border-color: var(--primary) !important; }
 .ReactCrop__drag-handle::after { background-color: var(--primary) !important; }
+
+/* ── FLOATING SAVE BUTTON ───────────────────────── */
+.floating-save {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 998;
+  box-shadow: var(--shadow-float);
+  padding: 12px 24px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideUp 0.3s ease-out;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all var(--transition);
+}
+
+.floating-save:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.floating-save:active {
+  transform: scale(0.95);
+}
+
+.floating-save--success {
+  background-color: var(--success);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 899px) {
+  .floating-save {
+    bottom: 80px; /* Above the mobile nav if there was one, or just higher */
+    right: 16px;
+    padding: 10px 16px;
+  }
+}
+

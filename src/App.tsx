@@ -38,7 +38,7 @@ function FieldError({ message }: { message?: string }) {
 }
 
 export default function App() {
-  const [photo, setPhoto] = useState('');
+  const [photo, setPhoto] = useState(() => localStorage.getItem('fyb_photo') || '');
   const [isGenerating, setIsGenerating] = useState(false);
   const [downloadDone, setDownloadDone] = useState(false);
   const [previewExpanded, setPreviewExpanded] = useState(window.innerWidth >= 900);
@@ -47,10 +47,23 @@ export default function App() {
   const {
     register, handleSubmit, watch, reset, control,
     formState: { errors },
-  } = useForm<FlyerData>({ mode: 'onBlur' });
+  } = useForm<FlyerData>({ 
+    mode: 'onBlur',
+    defaultValues: JSON.parse(localStorage.getItem('fyb_formData') || '{}')
+  });
 
   const watchedValues = watch();
   const debouncedValues = useDebounce({ ...watchedValues, photo }, 800);
+
+  // Persist form data to localStorage
+  useEffect(() => {
+    localStorage.setItem('fyb_formData', JSON.stringify(watchedValues));
+  }, [watchedValues]);
+
+  // Persist photo to localStorage
+  useEffect(() => {
+    localStorage.setItem('fyb_photo', photo);
+  }, [photo]);
 
   // Scroll to first error on failed submit
   useEffect(() => {
@@ -84,7 +97,25 @@ export default function App() {
   );
 
   const handleReset = useCallback(() => {
-    reset();
+    localStorage.removeItem('fyb_formData');
+    localStorage.removeItem('fyb_photo');
+    reset({
+      firstName: '',
+      surname: '',
+      dateOfBirth: '',
+      stateOfOrigin: '',
+      favouriteQuote: '',
+      socialHandle: '',
+      hobbies: '',
+      bestCourse: '',
+      bestLecturer: '',
+      bestLevel: '',
+      worstLevel: '',
+      favouriteCourseMate: '',
+      ifNotSoftware: '',
+      bestExperienceInAuchi: '',
+      worstExperienceInAuchi: '',
+    });
     setPhoto('');
     setDownloadDone(false);
   }, [reset]);
@@ -443,6 +474,34 @@ export default function App() {
       <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
         <FlyerTemplate data={debouncedValues} ref={captureRef} />
       </div>
+
+      {/* ── FLOATING SAVE BUTTON ── */}
+      <SaveButton watchedValues={watchedValues} photo={photo} />
     </div>
+  );
+}
+
+function SaveButton({ watchedValues, photo }: { watchedValues: any; photo: string }) {
+  const [showSaved, setShowSaved] = useState(false);
+
+  const handleManualSave = () => {
+    localStorage.setItem('fyb_formData', JSON.stringify(watchedValues));
+    localStorage.setItem('fyb_photo', photo);
+    setShowSaved(true);
+    setTimeout(() => setShowSaved(false), 2000);
+  };
+
+  return (
+    <button 
+      type="button" 
+      className={`floating-save ${showSaved ? 'floating-save--success' : ''}`}
+      onClick={handleManualSave}
+    >
+      {showSaved ? (
+        <>✅ Saved!</>
+      ) : (
+        <>💾 Save Draft</>
+      )}
+    </button>
   );
 }
