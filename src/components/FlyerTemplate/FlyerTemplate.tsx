@@ -74,7 +74,7 @@ export const FlyerTemplate = forwardRef<HTMLDivElement, Props>(({ data }, ref) =
       style={{
         width: '1080px',
         height: '1400px',
-        backgroundImage: 'url("/public/images/background.jpeg")',
+        backgroundImage: 'url("/images/background.jpeg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
